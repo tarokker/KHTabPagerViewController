@@ -133,11 +133,10 @@
     
     [[[self pageViewController] view] setFrame:frame];
     
-    [self.pageViewController setViewControllers:@[[self viewControllers][0]]
+    [self.pageViewController setViewControllers:@[[self viewControllers][_selectedIndex]]
                                       direction:UIPageViewControllerNavigationDirectionReverse
                                        animated:NO
                                      completion:nil];
-    [self setSelectedIndex:0];
 }
 
 - (void)reloadTabs {
