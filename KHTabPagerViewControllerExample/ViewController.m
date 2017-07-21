@@ -28,7 +28,10 @@
 
 @end
 @interface ViewController () <KHTabPagerDataSource, KHTabPagerDelegate>
-
+{
+@private
+    NSInteger _changeLabelCount;
+}
 @property (assign, nonatomic) BOOL isProgressive;
 
 @end
@@ -37,12 +40,16 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    _changeLabelCount = 0;
     
     self.view.backgroundColor = [UIColor lightGrayColor];
     self.title = NSLocalizedString(@"Tab Pager",nil);
     self.navigationController.navigationBar.tintColor = [UIColor whiteColor];
     UIBarButtonItem *button = [[UIBarButtonItem alloc] initWithTitle:@"Progressive" style:UIBarButtonItemStylePlain target:self action:@selector(switchProgressive)];
     self.navigationItem.rightBarButtonItem = button;
+    
+    UIBarButtonItem *button1 = [[UIBarButtonItem alloc] initWithTitle:@"CFGLabel" style:UIBarButtonItemStylePlain target:self action:@selector(changeLabel)];
+    self.navigationItem.leftBarButtonItem = button1;
     
     self.isProgressive = YES;
     
@@ -63,6 +70,12 @@
 - (void)switchProgressive {
     [self.navigationItem.rightBarButtonItem setTitle: self.isProgressive ?  @"Not Progressive" : @"Progressive" ];
     self.isProgressive = !self.isProgressive;
+}
+
+- (void)changeLabel
+{
+    ++_changeLabelCount;
+    [self reloadTabs];
 }
 
 #pragma mark - KHTabPagerDataSource
@@ -90,7 +103,7 @@
         case 1:
             return NSLocalizedString(@"Very Long Tab #2",nil);
         case 2:
-            return NSLocalizedString(@"T #3",nil);
+            return [NSString stringWithFormat:NSLocalizedString(@"T #3 %d",nil), _changeLabelCount];
         case 3:
             return NSLocalizedString(@"Tab #4",nil);
         default:

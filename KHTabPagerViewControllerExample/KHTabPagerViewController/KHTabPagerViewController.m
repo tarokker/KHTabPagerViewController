@@ -21,7 +21,6 @@
 @property (assign, nonatomic) NSInteger selectedIndex;
 
 @property (strong, nonatomic) NSMutableArray *viewControllers;
-@property (strong, nonatomic) NSMutableArray *tabTitles;
 @property (strong, nonatomic) UIColor *headerColor;
 @property (strong, nonatomic) UIColor *tabBackgroundColor;
 @property (assign, nonatomic) CGFloat headerHeight;
@@ -128,20 +127,14 @@
 
 - (void)reloadData {
     [self setViewControllers:[NSMutableArray array]];
-    [self setTabTitles:[NSMutableArray array]];
     
+    // Maio: rimossa creazione array con titoli, verranno caricati
+    // realtime dentro reloadTabs
     for (int i = 0; i < [[self dataSource] numberOfViewControllers]; i++) {
         UIViewController *viewController;
         
         if ((viewController = [[self dataSource] viewControllerForIndex:i]) != nil) {
             [[self viewControllers] addObject:viewController];
-        }
-        
-        if ([[self dataSource] respondsToSelector:@selector(titleForTabAtIndex:)]) {
-            NSString *title;
-            if ((title = [[self dataSource] titleForTabAtIndex:i]) != nil) {
-                [[self tabTitles] addObject:title];
-            }
         }
     }
     
@@ -225,18 +218,24 @@
             color = [UIColor blackColor];
         }
         
-        for (NSString *title in [self tabTitles]) {
-            UILabel *label = [UILabel new];
-            [label setText:title];
-            [label setTextAlignment:NSTextAlignmentCenter];
-            [label setFont:font];
-            [label setTextColor:color];
-            [label sizeToFit];
-            
-            CGRect frame = [label frame];
-            frame.size.width = MAX(frame.size.width + 20, 85);
-            [label setFrame:frame];
-            [tabViews addObject:label];
+        // Maio: cambiato il loop per rileggere in tempo reale il titolo dei tabs
+        for (int i = 0; i < [[self dataSource] numberOfViewControllers]; i++) {
+            if ([[self dataSource] respondsToSelector:@selector(titleForTabAtIndex:)]) {
+                NSString *title;
+                if ((title = [[self dataSource] titleForTabAtIndex:i]) != nil) {
+                    UILabel *label = [UILabel new];
+                    [label setText:title];
+                    [label setTextAlignment:NSTextAlignmentCenter];
+                    [label setFont:font];
+                    [label setTextColor:color];
+                    [label sizeToFit];
+                    
+                    CGRect frame = [label frame];
+                    frame.size.width = MAX(frame.size.width + 20, 85);
+                    [label setFrame:frame];
+                    [tabViews addObject:label];
+                }
+            }
         }
     }
     

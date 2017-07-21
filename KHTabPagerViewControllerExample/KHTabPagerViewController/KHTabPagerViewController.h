@@ -17,6 +17,7 @@
 @property (weak, nonatomic) id<KHTabPagerDelegate> delegate;
 
 - (void)reloadData;
+- (void)reloadTabs;
 - (NSInteger)selectedIndex;
 
 - (void)selectTabbarIndex:(NSInteger)index animation:(BOOL)animation;
