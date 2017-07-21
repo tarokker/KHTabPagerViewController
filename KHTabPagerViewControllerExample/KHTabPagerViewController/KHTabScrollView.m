@@ -134,9 +134,7 @@ const float kKHTabViewSpacing = 10.0f;
         [contentView addConstraints:@[[self tabIndicatorDisplacement], [self tabIndicatorWidth]]];
     }
     [self layoutIfNeeded];
-    if ((([UIView respondsToSelector:@selector(userInterfaceLayoutDirectionForSemanticContentAttribute:)]) && ([UIView userInterfaceLayoutDirectionForSemanticContentAttribute:self.semanticContentAttribute] == UIUserInterfaceLayoutDirectionRightToLeft)) || ([UIApplication sharedApplication].userInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft)) {
-        [self setContentOffset:CGPointMake(self.contentSize.width - self.frame.size.width, 0)];
-    }
+
     return self;
 }
 
@@ -152,18 +150,7 @@ const float kKHTabViewSpacing = 10.0f;
         animatedDuration = 0.0f;
     }
     
-    CGFloat x;
-    BOOL isRTL = NO;
-    if ([UIView respondsToSelector:@selector(userInterfaceLayoutDirectionForSemanticContentAttribute:)] && [UIView userInterfaceLayoutDirectionForSemanticContentAttribute:self.semanticContentAttribute] == UIUserInterfaceLayoutDirectionRightToLeft) {
-        isRTL = YES;
-    } else if ([UIApplication sharedApplication].userInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft) {
-        isRTL = YES;
-    }
-    if (isRTL) {
-        x = [[self tabViews][[self.tabViews count] - 1] frame].origin.x - (kKHTabViewSpacing / 2);
-    } else {
-        x = [[self tabViews][0] frame].origin.x - (kKHTabViewSpacing / 2);
-    }
+    CGFloat x = [[self tabViews][0] frame].origin.x - (kKHTabViewSpacing / 2);
     
     for (int i = 0; i < index; i++) {
         x += [[self tabViews][i] frame].size.width + kKHTabViewSpacing;
@@ -172,10 +159,6 @@ const float kKHTabViewSpacing = 10.0f;
     [UIView animateWithDuration:animatedDuration
                      animations:^{
                          CGFloat p = x - ((self.frame.size.width - w) / 2);
-                         if (isRTL) {
-                             p -= [[self tabViews][index] frame].size.width - kKHTabViewSpacing;
-                             p = -1 * p;
-                         }
                          CGFloat min = 0;
                          CGFloat max = MAX(0, self.contentSize.width - self.frame.size.width);
                          [self setContentOffset:CGPointMake(MAP(p, min, max), 0)];
@@ -187,29 +170,13 @@ const float kKHTabViewSpacing = 10.0f;
 
 - (void)animateFromTabAtIndex:(NSInteger)fromIndex toTabAtIndex:(NSInteger)toIndex withProgress:(float)progress {
     if (fromIndex != -1 && toIndex != -1) {
-        CGFloat x;
-        BOOL isRTL = NO;
-        if ([UIView respondsToSelector:@selector(userInterfaceLayoutDirectionForSemanticContentAttribute:)] && [UIView userInterfaceLayoutDirectionForSemanticContentAttribute:self.semanticContentAttribute] == UIUserInterfaceLayoutDirectionRightToLeft) {
-            isRTL = YES;
-        } else if ([UIApplication sharedApplication].userInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft) {
-            isRTL = YES;
-        }
-        
-        if (isRTL) {
-            x = [[self tabViews][[self.tabViews count] - 1] frame].origin.x - (kKHTabViewSpacing / 2);
-        } else {
-            x = [[self tabViews][0] frame].origin.x - (kKHTabViewSpacing / 2);
-        }
+        CGFloat x = [[self tabViews][0] frame].origin.x - (kKHTabViewSpacing / 2);
         CGFloat w = [[self tabViews][fromIndex] frame].size.width + kKHTabViewSpacing;
         for (int i = 0; i < fromIndex; i++) {
             x += [[self tabViews][i] frame].size.width + kKHTabViewSpacing;
         }
         
-        if (isRTL) {
-            x += fabs([[self tabViews][toIndex] frame].origin.x - [[self tabViews][fromIndex] frame].origin.x + ([[self tabViews][toIndex] frame].size.width - [[self tabViews][fromIndex] frame].size.width)) * progress;
-        } else {
-            x += fabs([[self tabViews][toIndex] frame].origin.x - [[self tabViews][fromIndex] frame].origin.x) * progress;
-        }
+        x += fabs([[self tabViews][toIndex] frame].origin.x - [[self tabViews][fromIndex] frame].origin.x) * progress;
         
         w += ([[self tabViews][toIndex] frame].size.width - [[self tabViews][fromIndex] frame].size.width) * fabs(progress);
         

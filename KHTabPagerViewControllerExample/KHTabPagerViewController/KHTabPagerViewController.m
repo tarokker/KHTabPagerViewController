@@ -9,6 +9,7 @@
 
 #import "KHTabPagerViewController.h"
 #import "KHTabScrollView.h"
+#import <objc/runtime.h>
 
 @interface KHTabPagerViewController () <KHTabScrollDelegate, UIPageViewControllerDataSource, UIPageViewControllerDelegate, UIScrollViewDelegate>
 {
@@ -29,6 +30,7 @@
 @property (strong, nonatomic) UIView *headerTopView;
 
 - (void)_refreshTabColorsAfterAppearing;
+- (UIViewController *)_requestViewControllerForIndex:(NSInteger)i;
 
 @end
 
@@ -81,20 +83,29 @@
     }
 }
 
+- (UIViewController *)_requestViewControllerForIndex:(NSInteger)i
+{
+    // chiediamo controllr
+    UIViewController *viewController = nil;
+    
+    if ((viewController = [[self dataSource] viewControllerForIndex:i]) != nil)
+    {
+        // Maio - injectiamo l'indice del controller
+        objc_setAssociatedObject(viewController, @"__KHTabPagerViewController_index__", @(i), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+    return viewController;
+}
+
 #pragma mark - Page View Data Source
 
 - (UIViewController *)pageViewController:(UIPageViewController *)pageViewController viewControllerBeforeViewController:(UIViewController *)viewController {
     NSUInteger pageIndex = [[self viewControllers] indexOfObject:viewController];
-    if (([[[UIDevice currentDevice] systemVersion] compare:@"9.0" options:NSNumericSearch] == NSOrderedAscending) && [UIApplication sharedApplication].userInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft) {
-        return pageIndex < [[self viewControllers] count] - 1 ? [self viewControllers][pageIndex + 1]: nil;
-    } else return pageIndex > 0 ? [self viewControllers][pageIndex - 1]: nil;
+    return pageIndex > 0 ? [self viewControllers][pageIndex - 1]: nil;
 }
 
 - (UIViewController *)pageViewController:(UIPageViewController *)pageViewController viewControllerAfterViewController:(UIViewController *)viewController {
     NSUInteger pageIndex = [[self viewControllers] indexOfObject:viewController];
-    if (([[[UIDevice currentDevice] systemVersion] compare:@"9.0" options:NSNumericSearch] == NSOrderedAscending) && [UIApplication sharedApplication].userInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft) {
-        return pageIndex > 0 ? [self viewControllers][pageIndex - 1]: nil;
-    } else return pageIndex < [[self viewControllers] count] - 1 ? [self viewControllers][pageIndex + 1]: nil;
+    return pageIndex < [[self viewControllers] count] - 1 ? [self viewControllers][pageIndex + 1]: nil;
 }
 
 #pragma mark - Page View Delegate
@@ -115,12 +126,12 @@
 - (void)reloadData {
     [self setViewControllers:[NSMutableArray array]];
     
-    // Maio: rimossa creazione array con titoli, verranno caricati
-    // realtime dentro reloadTabs
-    for (int i = 0; i < [[self dataSource] numberOfViewControllers]; i++) {
-        UIViewController *viewController;
-        
-        if ((viewController = [[self dataSource] viewControllerForIndex:i]) != nil) {
+    for (int i = 0; i < [[self dataSource] numberOfViewControllers]; i++)
+    {
+        UIViewController *viewController = [self _requestViewControllerForIndex:i];
+
+        if ( viewController )
+        {
             [[self viewControllers] addObject:viewController];
         }
     }
@@ -255,12 +266,7 @@
     if (index != [self selectedIndex] && !self.isTransitionInProgress) {
         self.pageScrollView.scrollEnabled = NO;
         tapped = true;
-        UIPageViewControllerNavigationDirection direction;
-        if ((([UIView respondsToSelector:@selector(userInterfaceLayoutDirectionForSemanticContentAttribute:)]) && ([UIView userInterfaceLayoutDirectionForSemanticContentAttribute:self.view.semanticContentAttribute] == UIUserInterfaceLayoutDirectionRightToLeft)) || ([UIApplication sharedApplication].userInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft)) {
-            direction = (index > [self selectedIndex]) ? UIPageViewControllerNavigationDirectionReverse : UIPageViewControllerNavigationDirectionForward;
-        } else {
-            direction = (index > [self selectedIndex]) ? UIPageViewControllerNavigationDirectionForward : UIPageViewControllerNavigationDirectionReverse;
-        }
+        UIPageViewControllerNavigationDirection direction = (index > [self selectedIndex]) ? UIPageViewControllerNavigationDirectionForward : UIPageViewControllerNavigationDirectionReverse;
         __weak typeof(self) weakSelf = self;
         [[self pageViewController]  setViewControllers:@[[self viewControllers][index]]
                                              direction:direction
@@ -285,9 +291,7 @@
     NSInteger fromIndex = self.selectedIndex;
     NSInteger toIndex = -1;
     progress = (offset.x - self.view.bounds.size.width) / self.view.bounds.size.width;
-    if ((([UIView respondsToSelector:@selector(userInterfaceLayoutDirectionForSemanticContentAttribute:)]) && ([UIView userInterfaceLayoutDirectionForSemanticContentAttribute:self.view.semanticContentAttribute] == UIUserInterfaceLayoutDirectionRightToLeft)) || ([UIApplication sharedApplication].userInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft)) {
-        progress = -1 * progress;
-    }
+
     if (progress > 0) {
         if (fromIndex < [[self viewControllers] count] - 1) {
             toIndex = fromIndex + 1;
