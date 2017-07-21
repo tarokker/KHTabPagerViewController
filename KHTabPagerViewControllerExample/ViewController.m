@@ -33,7 +33,7 @@
 }
 
 @end
-@interface ViewController () <KHTabPagerDataSource, KHTabPagerDelegate>
+@interface ViewController () <KHTabPagerDataSource>
 {
 @private
     NSInteger _changeLabelCount;
@@ -56,7 +56,6 @@
 
     
     [self setDataSource:self];
-    [self setDelegate:self];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -146,14 +145,5 @@
 }
 */
 
-#pragma mark - Tab Pager Delegate
-
-- (void)tabPager:(KHTabPagerViewController *)tabPager willTransitionToTabAtIndex:(NSInteger)index {
-    NSLog(@"Will transition from tab %ld to %ld", [self selectedIndex], (long)index);
-}
-
-- (void)tabPager:(KHTabPagerViewController *)tabPager didTransitionToTabAtIndex:(NSInteger)index {
-    NSLog(@"Did transition to tab %ld", (long)index);
-}
 
 @end

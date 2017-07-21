@@ -110,10 +110,6 @@
 
     // maio
     [self _refreshTabColorsAfterAppearing];
-    
-    if ([[self delegate] respondsToSelector:@selector(tabPager:didTransitionToTabAtIndex:)]) {
-        [[self delegate] tabPager:self didTransitionToTabAtIndex:[self selectedIndex]];
-    }
 }
 
 - (void)reloadData {
@@ -259,9 +255,6 @@
 - (void)tabScrollView:(KHTabScrollView *)tabScrollView didSelectTabAtIndex:(NSInteger)index {
     if (index != [self selectedIndex] && !self.isTransitionInProgress) {
         self.pageScrollView.scrollEnabled = NO;
-        if ([[self delegate] respondsToSelector:@selector(tabPager:willTransitionToTabAtIndex:)]) {
-            [[self delegate] tabPager:self willTransitionToTabAtIndex:index];
-        }
         tapped = true;
         UIPageViewControllerNavigationDirection direction;
         if ((([UIView respondsToSelector:@selector(userInterfaceLayoutDirectionForSemanticContentAttribute:)]) && ([UIView userInterfaceLayoutDirectionForSemanticContentAttribute:self.view.semanticContentAttribute] == UIUserInterfaceLayoutDirectionRightToLeft)) || ([UIApplication sharedApplication].userInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft)) {
@@ -278,10 +271,7 @@
                                                 
                                                 // maio
                                                 [weakSelf _refreshTabColorsAfterAppearing];
-                                                
-                                                if ([[weakSelf delegate] respondsToSelector:@selector(tabPager:didTransitionToTabAtIndex:)]) {
-                                                    [[weakSelf delegate] tabPager:self didTransitionToTabAtIndex:[self selectedIndex]];
-                                                }
+
                                                 weakSelf.pageScrollView.scrollEnabled = YES;
                                             }];
     }

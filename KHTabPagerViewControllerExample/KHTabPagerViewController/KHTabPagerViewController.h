@@ -9,12 +9,10 @@
 #import <UIKit/UIKit.h>
 
 @protocol KHTabPagerDataSource;
-@protocol KHTabPagerDelegate;
 
 @interface KHTabPagerViewController : UIViewController
 
 @property (weak, nonatomic) id<KHTabPagerDataSource> dataSource;
-@property (weak, nonatomic) id<KHTabPagerDelegate> delegate;
 
 - (void)reloadData;
 - (void)reloadTabs;
@@ -43,10 +41,3 @@
 
 @end
 
-@protocol KHTabPagerDelegate <NSObject>
-
-@optional
-- (void)tabPager:(KHTabPagerViewController *)tabPager willTransitionToTabAtIndex:(NSInteger)index;
-- (void)tabPager:(KHTabPagerViewController *)tabPager didTransitionToTabAtIndex:(NSInteger)index;
-
-@end
