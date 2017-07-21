@@ -21,7 +21,6 @@
 @property (strong, nonatomic) KHTabScrollView *header;
 @property (assign, nonatomic) NSInteger selectedIndex;
 
-@property (strong, nonatomic) NSMutableArray *viewControllers;
 @property (strong, nonatomic) UIColor *headerColor;
 @property (strong, nonatomic) UIColor *tabBackgroundColor;
 @property (assign, nonatomic) CGFloat headerHeight;
@@ -98,14 +97,16 @@
 
 #pragma mark - Page View Data Source
 
-- (UIViewController *)pageViewController:(UIPageViewController *)pageViewController viewControllerBeforeViewController:(UIViewController *)viewController {
-    NSUInteger pageIndex = [[self viewControllers] indexOfObject:viewController];
-    return pageIndex > 0 ? [self viewControllers][pageIndex - 1]: nil;
+- (UIViewController *)pageViewController:(UIPageViewController *)pageViewController viewControllerBeforeViewController:(UIViewController *)viewController
+{
+    NSUInteger pageIndex = [objc_getAssociatedObject(viewController, @"__KHTabPagerViewController_index__") integerValue];
+    return pageIndex > 0 ? [self _requestViewControllerForIndex:pageIndex - 1] : nil;
 }
 
-- (UIViewController *)pageViewController:(UIPageViewController *)pageViewController viewControllerAfterViewController:(UIViewController *)viewController {
-    NSUInteger pageIndex = [[self viewControllers] indexOfObject:viewController];
-    return pageIndex < [[self viewControllers] count] - 1 ? [self viewControllers][pageIndex + 1]: nil;
+- (UIViewController *)pageViewController:(UIPageViewController *)pageViewController viewControllerAfterViewController:(UIViewController *)viewController
+{
+    NSUInteger pageIndex = [objc_getAssociatedObject(viewController, @"__KHTabPagerViewController_index__") integerValue];
+    return pageIndex < [[self dataSource] numberOfViewControllers] - 1 ? [self _requestViewControllerForIndex:pageIndex + 1] : nil;
 }
 
 #pragma mark - Page View Delegate
@@ -114,8 +115,9 @@
     self.isTransitionInProgress = YES;
 }
 
-- (void)pageViewController:(UIPageViewController *)pageViewController didFinishAnimating:(BOOL)finished previousViewControllers:(NSArray *)previousViewControllers transitionCompleted:(BOOL)completed {
-    [self setSelectedIndex:[[self viewControllers] indexOfObject:[[self pageViewController] viewControllers][0]]];
+- (void)pageViewController:(UIPageViewController *)pageViewController didFinishAnimating:(BOOL)finished previousViewControllers:(NSArray *)previousViewControllers transitionCompleted:(BOOL)completed
+{
+    [self setSelectedIndex:[objc_getAssociatedObject([[self pageViewController] viewControllers][0], @"__KHTabPagerViewController_index__") integerValue]];
     [[self header] animateToTabAtIndex:[self selectedIndex]];
     self.isTransitionInProgress = NO;
 
@@ -123,19 +125,8 @@
     [self _refreshTabColorsAfterAppearing];
 }
 
-- (void)reloadData {
-    [self setViewControllers:[NSMutableArray array]];
-    
-    for (int i = 0; i < [[self dataSource] numberOfViewControllers]; i++)
-    {
-        UIViewController *viewController = [self _requestViewControllerForIndex:i];
-
-        if ( viewController )
-        {
-            [[self viewControllers] addObject:viewController];
-        }
-    }
-    
+- (void)reloadData
+{
     [self reloadTabs];
     
     CGRect frame = [[self view] frame];
@@ -144,7 +135,7 @@
     
     [[[self pageViewController] view] setFrame:frame];
     
-    [self.pageViewController setViewControllers:@[[self viewControllers][_selectedIndex]]
+    [self.pageViewController setViewControllers:@[[self _requestViewControllerForIndex:_selectedIndex]]
                                       direction:UIPageViewControllerNavigationDirectionReverse
                                        animated:NO
                                      completion:nil];
@@ -189,7 +180,7 @@
     NSMutableArray *tabViews = [NSMutableArray array];
     
     if ([[self dataSource] respondsToSelector:@selector(viewForTabAtIndex:)]) {
-        for (int i = 0; i < [[self viewControllers] count]; i++) {
+        for (int i = 0; i < [[self dataSource] numberOfViewControllers]; i++) {
             UIView *view;
             if ((view = [[self dataSource] viewForTabAtIndex:i]) != nil) {
                 [tabViews addObject:view];
@@ -262,13 +253,15 @@
     return (!self.isTransitionInProgress && !self.pageScrollView.isTracking && !self.pageScrollView.isDragging && !self.pageScrollView.isDecelerating);
 }
 
-- (void)tabScrollView:(KHTabScrollView *)tabScrollView didSelectTabAtIndex:(NSInteger)index {
-    if (index != [self selectedIndex] && !self.isTransitionInProgress) {
+- (void)tabScrollView:(KHTabScrollView *)tabScrollView didSelectTabAtIndex:(NSInteger)index
+{
+    if (index != [self selectedIndex] && !self.isTransitionInProgress)
+    {
+        __weak KHTabPagerViewController *weakSelf = self;
         self.pageScrollView.scrollEnabled = NO;
         tapped = true;
         UIPageViewControllerNavigationDirection direction = (index > [self selectedIndex]) ? UIPageViewControllerNavigationDirectionForward : UIPageViewControllerNavigationDirectionReverse;
-        __weak typeof(self) weakSelf = self;
-        [[self pageViewController]  setViewControllers:@[[self viewControllers][index]]
+        [[self pageViewController] setViewControllers:@[[self _requestViewControllerForIndex:index]]
                                              direction:direction
                                               animated:YES
                                             completion:^(BOOL finished) {
@@ -292,17 +285,22 @@
     NSInteger toIndex = -1;
     progress = (offset.x - self.view.bounds.size.width) / self.view.bounds.size.width;
 
-    if (progress > 0) {
-        if (fromIndex < [[self viewControllers] count] - 1) {
+    if (progress > 0)
+    {
+        if (fromIndex < [[self dataSource] numberOfViewControllers] - 1)
+        {
             toIndex = fromIndex + 1;
         }
     }
-    else {
-        if (fromIndex > 0) {
+    else
+    {
+        if (fromIndex > 0)
+        {
             toIndex = fromIndex - 1;
         }
     }
-    if (!tapped) {
+    if (!tapped)
+    {
         [[self header] animateFromTabAtIndex:fromIndex toTabAtIndex:toIndex withProgress:progress];
     }
     else if (fabs(progress) >= 0.999999 || fabs(progress) <= 0.000001)
@@ -333,8 +331,9 @@
     [self selectTabbarIndex:index animation:NO];
 }
 
-- (void)selectTabbarIndex:(NSInteger)index animation:(BOOL)animation {
-    [self.pageViewController setViewControllers:@[[self viewControllers][index]]
+- (void)selectTabbarIndex:(NSInteger)index animation:(BOOL)animation
+{
+    [self.pageViewController setViewControllers:@[[self _requestViewControllerForIndex:index]]
                                       direction:UIPageViewControllerNavigationDirectionReverse
                                        animated:animation
                                      completion:nil];
