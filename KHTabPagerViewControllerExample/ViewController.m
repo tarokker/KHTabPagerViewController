@@ -8,6 +8,25 @@
 
 #import "ViewController.h"
 
+@interface DemoCtl : UIViewController
+
+@end
+
+@implementation DemoCtl
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    NSLog(@"View Will Appear");
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    NSLog(@"View DID Appear");
+}
+
+@end
 @interface ViewController () <KHTabPagerDataSource, KHTabPagerDelegate>
 
 @property (assign, nonatomic) BOOL isProgressive;
@@ -52,7 +71,7 @@
 }
 
 - (UIViewController *)viewControllerForIndex:(NSInteger)index {
-    UIViewController *vc = [UIViewController new];
+    DemoCtl *vc = [DemoCtl new];
     [[vc view] setBackgroundColor:[UIColor colorWithRed:arc4random_uniform(255) / 255.0f
                                                   green:arc4random_uniform(255) / 255.0f
                                                    blue:arc4random_uniform(255) / 255.0f alpha:1]];
@@ -79,10 +98,12 @@
     }
 }
 
+/*
 - (CGFloat)tabHeight {
-    // Default: 44.0f
+    // Default: 48.0f
     return 40.0f;
 }
+*/
 
 - (CGFloat)tabBarTopViewHeight {
     //Default 0.0f;
@@ -108,9 +129,11 @@
     return [UIColor whiteColor];
 }
 
+/*
 -(UIFont *)titleFont {
     return [UIFont systemFontOfSize:18];
 }
+*/
 
 -(BOOL)isProgressiveTabBar{
     return self.isProgressive;

@@ -30,6 +30,8 @@
 @property (assign, nonatomic) CGFloat headerPadding;
 @property (strong, nonatomic) UIView *headerTopView;
 
+- (void)_refreshTabColorsAfterAppearing;
+
 @end
 
 @implementation KHTabPagerViewController
@@ -70,6 +72,17 @@
     [super didReceiveMemoryWarning];
 }
 
+# pragma mark - Private Methods
+
+// Maio - chiamato dopo che ci siamo spostati su un tab
+- (void)_refreshTabColorsAfterAppearing
+{
+    for ( NSInteger c = 0; c < [[_header tabViews] count]; c++ )
+    {
+        [[_header tabViews][c] setAlpha:c == _selectedIndex ? 1.0 : 0.4];
+    }
+}
+
 #pragma mark - Page View Data Source
 
 - (UIViewController *)pageViewController:(UIPageViewController *)pageViewController viewControllerBeforeViewController:(UIViewController *)viewController {
@@ -104,6 +117,9 @@
     [self setSelectedIndex:[[self viewControllers] indexOfObject:[[self pageViewController] viewControllers][0]]];
     [[self header] animateToTabAtIndex:[self selectedIndex]];
     self.isTransitionInProgress = NO;
+
+    // maio
+    [self _refreshTabColorsAfterAppearing];
     
     if ([[self delegate] respondsToSelector:@selector(tabPager:didTransitionToTabAtIndex:)]) {
         [[self delegate] tabPager:self didTransitionToTabAtIndex:[self selectedIndex]];
@@ -151,7 +167,7 @@
     if ([[self dataSource] respondsToSelector:@selector(tabHeight)]) {
         [self setHeaderHeight:[[self dataSource] tabHeight]];
     } else {
-        [self setHeaderHeight:44.0f];
+        [self setHeaderHeight:48.0];
     }
     
     if ([[self dataSource] respondsToSelector:@selector(tabColor)]) {
@@ -199,7 +215,7 @@
         if ([[self dataSource] respondsToSelector:@selector(titleFont)]) {
             font = [[self dataSource] titleFont];
         } else {
-            font = [UIFont fontWithName:@"HelveticaNeue-Thin" size:20.0f];
+            font = [UIFont boldSystemFontOfSize:16.0];
         }
         
         UIColor *color;
@@ -244,6 +260,9 @@
     
     [[self view] addSubview:[self header]];
     [[self view] addSubview:[self headerTopView]];
+    
+    // Maio
+    [self _refreshTabColorsAfterAppearing];
 }
 
 #pragma mark - Tab Scroll View Delegate
@@ -271,6 +290,10 @@
                                               animated:YES
                                             completion:^(BOOL finished) {
                                                 [weakSelf setSelectedIndex:index];
+                                                
+                                                // maio
+                                                [weakSelf _refreshTabColorsAfterAppearing];
+                                                
                                                 if ([[weakSelf delegate] respondsToSelector:@selector(tabPager:didTransitionToTabAtIndex:)]) {
                                                     [[weakSelf delegate] tabPager:self didTransitionToTabAtIndex:[self selectedIndex]];
                                                 }
@@ -341,6 +364,8 @@
                                      completion:nil];
     [[self header] animateToTabAtIndex:index animated:animation];
     [self setSelectedIndex:index];
+    // Maio
+    [self _refreshTabColorsAfterAppearing];
 }
 
 @end

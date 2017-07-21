@@ -16,7 +16,6 @@ const float kKHTabViewSpacing = 10.0f;
 
 - (void)_initTabbarAtIndex:(NSInteger)index;
 
-@property (strong, nonatomic) NSArray *tabViews;
 @property (strong, nonatomic) NSLayoutConstraint *tabIndicatorDisplacement;
 @property (strong, nonatomic) NSLayoutConstraint *tabIndicatorWidth;
 
@@ -45,7 +44,7 @@ const float kKHTabViewSpacing = 10.0f;
         [self setShowsHorizontalScrollIndicator:NO];
         [self setBounces:NO];
         
-        [self setTabViews:tabViews];
+        _tabViews = tabViews;
         
         CGFloat width = kKHTabViewSpacing;
         
@@ -102,9 +101,9 @@ const float kKHTabViewSpacing = 10.0f;
                                                                             metrics:nil
                                                                               views:@{@"S": bottomLine}]];
         
-        [contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-height-[S(2)]-0-|"
+        [contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-height-[S(0)]-0-|"
                                                                             options:0
-                                                                            metrics:@{@"height": @(height - 2.0f)}
+                                                                            metrics:@{@"height": @(height - 0.0f)}
                                                                               views:@{@"S": bottomLine}]];
         UIView *tabIndicator = [UIView new];
         [tabIndicator setTranslatesAutoresizingMaskIntoConstraints:NO];
@@ -127,7 +126,7 @@ const float kKHTabViewSpacing = 10.0f;
                                                                multiplier:1.0f
                                                                  constant:[tabViews[0] frame].size.width + kKHTabViewSpacing]];
         
-        [contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[S(5)]-0-|"
+        [contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[S(2)]-0-|"
                                                                             options:0
                                                                             metrics:nil
                                                                               views:@{@"S": tabIndicator}]];

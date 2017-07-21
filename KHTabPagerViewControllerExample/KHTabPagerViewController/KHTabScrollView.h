@@ -17,6 +17,8 @@
 - (instancetype)initWithFrame:(CGRect)frame tabViews:(NSArray *)tabViews tabBarHeight:(CGFloat)height tabBarTopViewHeight:(CGFloat)padding tabColor:(UIColor *)color backgroundColor:(UIColor *)backgroundColor selectedTabIndex:(NSInteger)index;
 - (instancetype)initWithFrame:(CGRect)frame tabViews:(NSArray *)tabViews tabBarHeight:(CGFloat)height tabBarTopViewHeight:(CGFloat)padding tabColor:(UIColor *)color backgroundColor:(UIColor *)backgroundColor;
 
+@property (strong, nonatomic, readonly) NSArray *tabViews;
+
 - (void)animateToTabAtIndex:(NSInteger)index;
 - (void)animateToTabAtIndex:(NSInteger)index animated:(BOOL)animated;
 - (void)animateFromTabAtIndex:(NSInteger)fromIndex toTabAtIndex:(NSInteger)toIndex withProgress:(float)progress;
