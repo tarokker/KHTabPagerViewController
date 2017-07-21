@@ -14,6 +14,12 @@
 
 @implementation DemoCtl
 
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    NSLog(@"Loading controller view");
+}
+
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
@@ -80,7 +86,7 @@
 
 #pragma mark - KHTabPagerDataSource
 - (NSInteger)numberOfViewControllers {
-    return 4;
+    return 38;
 }
 
 - (UIViewController *)viewControllerForIndex:(NSInteger)index {
@@ -107,7 +113,7 @@
         case 3:
             return NSLocalizedString(@"Tab #4",nil);
         default:
-            return nil;
+            return [NSString stringWithFormat:@"Test: %ld", (long)index];
     }
 }
 
