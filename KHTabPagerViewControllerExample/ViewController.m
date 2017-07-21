@@ -129,20 +129,20 @@
     view.autoresizingMask = UIViewAutoresizingNone;
     return view;
 }
-
+/*
 - (UIColor *)tabColor {
     return [UIColor whiteColor];
 }
-
+*/
 -(UIColor *)tabBackgroundColor {
     return [UIColor colorWithRed:1.0f/255.0f green:87.0f/255.0f blue:155.0f/255.0f alpha:1];
 }
-
+/*
 -(UIColor *)titleColor {
     return [UIColor whiteColor];
 }
 
-/*
+
 -(UIFont *)titleFont {
     return [UIFont systemFontOfSize:18];
 }

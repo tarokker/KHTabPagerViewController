@@ -166,7 +166,7 @@
     if ([[self dataSource] respondsToSelector:@selector(tabColor)]) {
         [self setHeaderColor:[[self dataSource] tabColor]];
     } else {
-        [self setHeaderColor:[UIColor orangeColor]];
+        [self setHeaderColor:[UIColor whiteColor]];
     }
     
     if ([[self dataSource] respondsToSelector:@selector(tabBackgroundColor)]) {
@@ -215,7 +215,7 @@
         if ([[self dataSource] respondsToSelector:@selector(titleColor)]) {
             color = [[self dataSource] titleColor];
         } else {
-            color = [UIColor blackColor];
+            color = [UIColor whiteColor];
         }
         
         // Maio: cambiato il loop per rileggere in tempo reale il titolo dei tabs
