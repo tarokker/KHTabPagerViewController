@@ -40,7 +40,6 @@
 - (UIColor *)titleColor;
 - (CGFloat)tabBarTopViewHeight;
 - (UIView *)tabBarTopView;
-- (BOOL)isProgressiveTabBar;
 
 @end
 

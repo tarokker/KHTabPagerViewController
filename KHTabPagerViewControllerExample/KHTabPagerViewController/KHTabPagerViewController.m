@@ -24,7 +24,6 @@
 @property (strong, nonatomic) UIColor *headerColor;
 @property (strong, nonatomic) UIColor *tabBackgroundColor;
 @property (assign, nonatomic) CGFloat headerHeight;
-@property (assign, nonatomic) BOOL isProgressive;
 @property (assign, nonatomic) BOOL isTransitionInProgress;
 @property (assign, nonatomic) CGFloat headerPadding;
 @property (strong, nonatomic) UIView *headerTopView;
@@ -102,14 +101,6 @@
 
 - (void)pageViewController:(UIPageViewController *)pageViewController willTransitionToViewControllers:(NSArray *)pendingViewControllers {
     self.isTransitionInProgress = YES;
-    if (!self.isProgressive) {
-        NSInteger index = [[self viewControllers] indexOfObject:pendingViewControllers[0]];
-        [[self header] animateToTabAtIndex:index];
-        
-        if ([[self delegate] respondsToSelector:@selector(tabPager:willTransitionToTabAtIndex:)]) {
-            [[self delegate] tabPager:self willTransitionToTabAtIndex:index];
-        }
-    }
 }
 
 - (void)pageViewController:(UIPageViewController *)pageViewController didFinishAnimating:(BOOL)finished previousViewControllers:(NSArray *)previousViewControllers transitionCompleted:(BOOL)completed {
@@ -173,11 +164,6 @@
         [self setTabBackgroundColor:[[self dataSource] tabBackgroundColor]];
     } else {
         [self setTabBackgroundColor:[UIColor colorWithWhite:0.95f alpha:1.0f]];
-    }
-    if ([[self dataSource] respondsToSelector:@selector(isProgressiveTabBar)]) {
-        [self setIsProgressive:[[self dataSource] isProgressiveTabBar]];
-    } else {
-        [self setIsProgressive:YES];
     }
     
     if ([[self dataSource] respondsToSelector:@selector(tabBarTopViewHeight)]) {
@@ -305,31 +291,29 @@
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
-    if ([self isProgressive]) {
-        CGPoint offset = scrollView.contentOffset;
-        float progress = 0;
-        NSInteger fromIndex = self.selectedIndex;
-        NSInteger toIndex = -1;
-        progress = (offset.x - self.view.bounds.size.width) / self.view.bounds.size.width;
-        if ((([UIView respondsToSelector:@selector(userInterfaceLayoutDirectionForSemanticContentAttribute:)]) && ([UIView userInterfaceLayoutDirectionForSemanticContentAttribute:self.view.semanticContentAttribute] == UIUserInterfaceLayoutDirectionRightToLeft)) || ([UIApplication sharedApplication].userInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft)) {
-            progress = -1 * progress;
-        }
-        if (progress > 0) {
-            if (fromIndex < [[self viewControllers] count] - 1) {
-                toIndex = fromIndex + 1;
-            }
-        }
-        else {
-            if (fromIndex > 0) {
-                toIndex = fromIndex - 1;
-            }
-        }
-        if (!tapped) {
-            [[self header] animateFromTabAtIndex:fromIndex toTabAtIndex:toIndex withProgress:progress];
-        }
-        else if (fabs(progress) >= 0.999999 || fabs(progress) <= 0.000001)
-            tapped = false;
+    CGPoint offset = scrollView.contentOffset;
+    float progress = 0;
+    NSInteger fromIndex = self.selectedIndex;
+    NSInteger toIndex = -1;
+    progress = (offset.x - self.view.bounds.size.width) / self.view.bounds.size.width;
+    if ((([UIView respondsToSelector:@selector(userInterfaceLayoutDirectionForSemanticContentAttribute:)]) && ([UIView userInterfaceLayoutDirectionForSemanticContentAttribute:self.view.semanticContentAttribute] == UIUserInterfaceLayoutDirectionRightToLeft)) || ([UIApplication sharedApplication].userInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft)) {
+        progress = -1 * progress;
     }
+    if (progress > 0) {
+        if (fromIndex < [[self viewControllers] count] - 1) {
+            toIndex = fromIndex + 1;
+        }
+    }
+    else {
+        if (fromIndex > 0) {
+            toIndex = fromIndex - 1;
+        }
+    }
+    if (!tapped) {
+        [[self header] animateFromTabAtIndex:fromIndex toTabAtIndex:toIndex withProgress:progress];
+    }
+    else if (fabs(progress) >= 0.999999 || fabs(progress) <= 0.000001)
+        tapped = false;
 }
 
 -(void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {

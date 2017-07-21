@@ -38,7 +38,6 @@
 @private
     NSInteger _changeLabelCount;
 }
-@property (assign, nonatomic) BOOL isProgressive;
 
 @end
 
@@ -51,13 +50,10 @@
     self.view.backgroundColor = [UIColor lightGrayColor];
     self.title = NSLocalizedString(@"Tab Pager",nil);
     self.navigationController.navigationBar.tintColor = [UIColor whiteColor];
-    UIBarButtonItem *button = [[UIBarButtonItem alloc] initWithTitle:@"Progressive" style:UIBarButtonItemStylePlain target:self action:@selector(switchProgressive)];
-    self.navigationItem.rightBarButtonItem = button;
-    
+       
     UIBarButtonItem *button1 = [[UIBarButtonItem alloc] initWithTitle:@"CFGLabel" style:UIBarButtonItemStylePlain target:self action:@selector(changeLabel)];
     self.navigationItem.leftBarButtonItem = button1;
-    
-    self.isProgressive = YES;
+
     
     [self setDataSource:self];
     [self setDelegate:self];
@@ -73,10 +69,6 @@
     // Dispose of any resources that can be recreated.
 }
 
-- (void)switchProgressive {
-    [self.navigationItem.rightBarButtonItem setTitle: self.isProgressive ?  @"Not Progressive" : @"Progressive" ];
-    self.isProgressive = !self.isProgressive;
-}
 
 - (void)changeLabel
 {
@@ -153,10 +145,6 @@
     return [UIFont systemFontOfSize:18];
 }
 */
-
--(BOOL)isProgressiveTabBar{
-    return self.isProgressive;
-}
 
 #pragma mark - Tab Pager Delegate
 
