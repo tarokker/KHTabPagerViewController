@@ -9,7 +9,7 @@
 #import "ViewController.h"
 
 @interface DemoCtl : UIViewController
-
+@property(nonatomic, strong) UILabel *lblTest;
 @end
 
 @implementation DemoCtl
@@ -18,6 +18,12 @@
 {
     [super viewDidLoad];
     NSLog(@"Loading controller view");
+    if ( !_lblTest )
+    {
+        _lblTest = [[UILabel alloc] initWithFrame:CGRectMake(50, 50, 100, 100)];
+        _lblTest.text = @"prova";
+        [self.view addSubview:_lblTest];
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -33,12 +39,15 @@
 }
 
 @end
+
+#define TOT_CTLS 3
+
 @interface ViewController () <KHTabPagerDataSource>
 {
 @private
     NSInteger _changeLabelCount;
+    DemoCtl *democtls[TOT_CTLS];
 }
-
 @end
 
 @implementation ViewController
@@ -80,12 +89,18 @@
     return 38;
 }
 
-- (UIViewController *)viewControllerForIndex:(NSInteger)index {
-    DemoCtl *vc = [DemoCtl new];
-    [[vc view] setBackgroundColor:[UIColor colorWithRed:arc4random_uniform(255) / 255.0f
-                                                  green:arc4random_uniform(255) / 255.0f
-                                                   blue:arc4random_uniform(255) / 255.0f alpha:1]];
-    return vc;
+- (UIViewController *)viewControllerForIndex:(NSInteger)index
+{
+    NSInteger real_index = index % TOT_CTLS;
+    if ( !democtls[real_index] )
+    {
+        democtls[real_index] = [DemoCtl new];
+        [[democtls[real_index] view] setBackgroundColor:[UIColor colorWithRed:arc4random_uniform(255) / 255.0f
+                                                      green:arc4random_uniform(255) / 255.0f
+                                                       blue:arc4random_uniform(255) / 255.0f alpha:1]];
+    }
+    democtls[real_index].lblTest.text = [NSString stringWithFormat:@"prova: %ld", (long)index];
+    return democtls[real_index];
 }
 
 // Implement either viewForTabAtIndex: or titleForTabAtIndex:
