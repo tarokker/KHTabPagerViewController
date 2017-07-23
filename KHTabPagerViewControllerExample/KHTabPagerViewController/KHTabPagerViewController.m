@@ -47,7 +47,7 @@
         if ([view isKindOfClass:[UIScrollView class]]) {
             self.pageScrollView = (UIScrollView *)view;
             [self.pageScrollView setCanCancelContentTouches:YES];
-            [self.pageScrollView setDelaysContentTouches:YES]; // Maio
+            [self.pageScrollView setDelaysContentTouches:NO];
             [self.pageScrollView setBounces:NO]; // Maio
             [self.pageScrollView setDelegate:self];
         }
