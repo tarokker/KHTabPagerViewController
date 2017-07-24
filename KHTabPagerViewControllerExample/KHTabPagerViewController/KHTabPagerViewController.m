@@ -13,7 +13,9 @@
 
 @interface KHTabPagerViewController () <KHTabScrollDelegate, UIPageViewControllerDataSource, UIPageViewControllerDelegate, UIScrollViewDelegate>
 {
+@private
     BOOL tapped;
+    UIViewController *_fakeTabAnimController;
 }
 
 @property (strong, nonatomic) UIPageViewController *pageViewController;
@@ -258,20 +260,40 @@
     if (index != [self selectedIndex] && !self.isTransitionInProgress)
     {
         __weak KHTabPagerViewController *weakSelf = self;
-        self.pageScrollView.scrollEnabled = NO;
-        tapped = true;
-        UIPageViewControllerNavigationDirection direction = (index > [self selectedIndex]) ? UIPageViewControllerNavigationDirectionForward : UIPageViewControllerNavigationDirectionReverse;
-        [[self pageViewController] setViewControllers:@[[self _requestViewControllerForIndex:index]]
-                                             direction:direction
-                                              animated:YES
-                                            completion:^(BOOL finished) {
-                                                [weakSelf setSelectedIndex:index];
-                                                
-                                                // maio
-                                                [weakSelf _refreshTabColorsAfterAppearing];
-
-                                                weakSelf.pageScrollView.scrollEnabled = YES;
-                                            }];
+        
+        void(^completionBlock)() = ^()
+        {
+            [weakSelf setSelectedIndex:index];
+            
+            // maio
+            [weakSelf _refreshTabColorsAfterAppearing];
+            
+            weakSelf.pageScrollView.scrollEnabled = YES;
+        };
+        
+        if ( _enableTapClickAnimation )
+        {
+            self.pageScrollView.scrollEnabled = NO;
+            tapped = true;
+            UIPageViewControllerNavigationDirection direction = (index > [self selectedIndex]) ? UIPageViewControllerNavigationDirectionForward : UIPageViewControllerNavigationDirectionReverse;
+            [[self pageViewController] setViewControllers:@[[self _requestViewControllerForIndex:index]]
+                                                direction:direction
+                                                 animated:YES
+                                               completion:^(BOOL finished) {
+                                                   completionBlock();
+                                               }];
+        }
+        else
+        {
+            // nessuna animazione durante il tap su tabbar
+            if ( !_fakeTabAnimController)
+            {
+                _fakeTabAnimController = [[UIViewController alloc] init];
+            }
+            [[self pageViewController] setViewControllers:@[_fakeTabAnimController] direction:UIPageViewControllerNavigationDirectionForward animated:NO completion:nil];
+            [[self pageViewController] setViewControllers:@[[self _requestViewControllerForIndex:index]] direction:UIPageViewControllerNavigationDirectionForward animated:NO completion:nil];
+            completionBlock();
+        }
     }
 }
 

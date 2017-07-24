@@ -20,6 +20,8 @@
 
 - (void)selectTabbarIndex:(NSInteger)index animation:(BOOL)animation;
 
+@property (assign, nonatomic) BOOL enableTapClickAnimation;
+
 @end
 
 @protocol KHTabPagerDataSource <NSObject>
