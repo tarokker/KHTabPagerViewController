@@ -16,7 +16,7 @@
 @private
     BOOL tapped;
     UIViewController *_fakeTabAnimController;
-    CALayer *shadowLayer;
+    UIView *_shadowView;
 }
 
 @property (strong, nonatomic) UIPageViewController *pageViewController;
@@ -123,7 +123,7 @@
     [self setSelectedIndex:[objc_getAssociatedObject([[self pageViewController] viewControllers][0], @"__KHTabPagerViewController_index__") integerValue]];
     [[self header] animateToTabAtIndex:[self selectedIndex]];
     self.isTransitionInProgress = NO;
-
+    
     // maio
     [self _refreshTabColorsAfterAppearing];
 }
@@ -247,18 +247,27 @@
     [[self view] addSubview:[self headerTopView]];
     
     // aggiunge ombra sotto la headerview
-    [shadowLayer removeFromSuperlayer];
+    [_shadowView removeFromSuperview];
+    _shadowView = nil;
+    
     if ( !_disableAutomaticShadow )
     {
-        shadowLayer = [CALayer layer];
-        shadowLayer.shadowOffset = CGSizeMake(0.0, 0.0);
+        _shadowView = [[UIView alloc] initWithFrame:CGRectMake([self header].frame.origin.x, CGRectGetMaxY([self header].frame), [self header].frame.size.width, 10.0)];
+        _shadowView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin;
+        _shadowView.backgroundColor = UIColor.clearColor;
+        _shadowView.clipsToBounds = YES;
+        
+        CALayer *shadowLayer = [CALayer layer];
+        shadowLayer.shadowOffset = CGSizeMake(0.0, -3.0);
         shadowLayer.shadowColor = UIColor.blackColor.CGColor;
-        shadowLayer.shadowOpacity = 0.4;
-        shadowLayer.shadowRadius = 5.0;
-        shadowLayer.shadowPath = [UIBezierPath bezierPathWithRect:CGRectMake([self header].frame.origin.x, CGRectGetMaxY([self header].frame), [self header].frame.size.width, 5.0)].CGPath;
-        [[self view].layer addSublayer:shadowLayer];
+        shadowLayer.shadowOpacity = 0.3;
+        shadowLayer.shadowRadius = 3.0;
+        shadowLayer.shadowPath = [UIBezierPath bezierPathWithRect:CGRectMake(-40, -3.0, _shadowView.frame.size.width + 80, _shadowView.frame.size.height)].CGPath;
+        [_shadowView.layer addSublayer:shadowLayer];
+        
+        [[self view] addSubview:_shadowView];
     }
-
+    
     // Maio
     [self _refreshTabColorsAfterAppearing];
 }
@@ -320,7 +329,7 @@
     NSInteger fromIndex = self.selectedIndex;
     NSInteger toIndex = -1;
     progress = (offset.x - self.view.bounds.size.width) / self.view.bounds.size.width;
-
+    
     if (progress > 0)
     {
         if (fromIndex < [[self dataSource] numberOfViewControllers] - 1)
