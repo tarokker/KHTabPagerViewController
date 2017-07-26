@@ -16,6 +16,7 @@
 @private
     BOOL tapped;
     UIViewController *_fakeTabAnimController;
+    CALayer *shadowLayer;
 }
 
 @property (strong, nonatomic) UIPageViewController *pageViewController;
@@ -246,13 +247,16 @@
     [[self view] addSubview:[self headerTopView]];
     
     // aggiunge ombra sotto la headerview
+    [shadowLayer removeFromSuperlayer];
     if ( !_disableAutomaticShadow )
     {
-        [[self header] setClipsToBounds:NO];
-        [self header].layer.shadowOffset = CGSizeMake(0.0, 3.0);
-        [self header].layer.shadowColor = UIColor.blackColor.CGColor;
-        [self header].layer.shadowOpacity = 0.3;
-        [self header].layer.shadowRadius = 3.0;
+        shadowLayer = [CALayer layer];
+        shadowLayer.shadowOffset = CGSizeMake(0.0, 0.0);
+        shadowLayer.shadowColor = UIColor.blackColor.CGColor;
+        shadowLayer.shadowOpacity = 0.4;
+        shadowLayer.shadowRadius = 5.0;
+        shadowLayer.shadowPath = [UIBezierPath bezierPathWithRect:CGRectMake([self header].frame.origin.x, CGRectGetMaxY([self header].frame), [self header].frame.size.width, 5.0)].CGPath;
+        [[self view].layer addSublayer:shadowLayer];
     }
 
     // Maio
