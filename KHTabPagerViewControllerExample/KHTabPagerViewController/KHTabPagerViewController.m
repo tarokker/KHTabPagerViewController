@@ -245,6 +245,16 @@
     [[self view] addSubview:[self header]];
     [[self view] addSubview:[self headerTopView]];
     
+    // aggiunge ombra sotto la headerview
+    if ( !_disableAutomaticShadow )
+    {
+        [[self header] setClipsToBounds:NO];
+        [self header].layer.shadowOffset = CGSizeMake(0.0, 3.0);
+        [self header].layer.shadowColor = UIColor.blackColor.CGColor;
+        [self header].layer.shadowOpacity = 0.3;
+        [self header].layer.shadowRadius = 3.0;
+    }
+
     // Maio
     [self _refreshTabColorsAfterAppearing];
 }

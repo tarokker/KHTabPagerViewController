@@ -21,6 +21,7 @@
 - (void)selectTabbarIndex:(NSInteger)index animation:(BOOL)animation;
 
 @property (assign, nonatomic) BOOL enableTapClickAnimation;
+@property (nonatomic, assign) BOOL disableAutomaticShadow;
 
 @end
 
