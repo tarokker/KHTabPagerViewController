@@ -255,6 +255,7 @@
         _shadowView = [[UIView alloc] initWithFrame:CGRectMake([self header].frame.origin.x, CGRectGetMaxY([self header].frame), [self header].frame.size.width, 10.0)];
         _shadowView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin;
         _shadowView.backgroundColor = UIColor.clearColor;
+        _shadowView.userInteractionEnabled = NO;
         _shadowView.clipsToBounds = YES;
         
         CALayer *shadowLayer = [CALayer layer];
