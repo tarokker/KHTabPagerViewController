@@ -10,6 +10,10 @@
 
 @protocol KHTabPagerDataSource;
 
+@interface UILabelPagerNew : UILabel
+@property(nonatomic, assign) NSInteger assignedIndex;
+@end
+
 @interface KHTabPagerViewController : UIViewController
 
 @property (weak, nonatomic) id<KHTabPagerDataSource> dataSource;
@@ -38,7 +42,8 @@
 - (UIColor *)tabColor;
 - (UIColor *)tabBackgroundColor;
 - (UIFont *)titleFont;
-- (UIColor *)titleColor;
+- (UIColor *)titleColorForIndex:(NSInteger)index;
+- (UIColor *)titleColorUnselectedForIndex:(NSInteger)index;
 - (CGFloat)tabBarTopViewHeight;
 - (UIView *)tabBarTopView;
 

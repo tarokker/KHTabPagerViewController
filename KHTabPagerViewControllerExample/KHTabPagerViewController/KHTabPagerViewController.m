@@ -11,6 +11,9 @@
 #import "KHTabScrollView.h"
 #import <objc/runtime.h>
 
+@implementation UILabelPagerNew
+@end
+
 @interface KHTabPagerViewController () <KHTabScrollDelegate, UIPageViewControllerDataSource, UIPageViewControllerDelegate, UIScrollViewDelegate>
 {
 @private
@@ -79,10 +82,39 @@
 // Maio - chiamato dopo che ci siamo spostati su un tab
 - (void)_refreshTabColorsAfterAppearing
 {
-    for ( NSInteger c = 0; c < [[_header tabViews] count]; c++ )
+    for (UIView *mview in [_header tabViews])
     {
-        [[_header tabViews][c] setAlpha:c == _selectedIndex ? 1.0 : 0.4];
+        if ( [mview isKindOfClass:[UILabelPagerNew class]] )
+        {
+            UILabelPagerNew *lbl = (UILabelPagerNew *)mview;
+            UIColor *color;
+
+            if ( _selectedIndex == lbl.assignedIndex )
+            {
+                if ([[self dataSource] respondsToSelector:@selector(titleColorForIndex:)]) {
+                    color = [[self dataSource] titleColorForIndex:lbl.assignedIndex];
+                } else {
+                    color = [UIColor whiteColor];
+                }
+            }
+            else
+            {
+                if ([[self dataSource] respondsToSelector:@selector(titleColorUnselectedForIndex:)]) {
+                    color = [[self dataSource] titleColorUnselectedForIndex:lbl.assignedIndex];
+                } else {
+                    color = [UIColor colorWithWhite:1.0 alpha:0.4];
+                }
+            }
+            
+            [lbl setTextColor:color];
+        }
     }
+    /*
+     for ( NSInteger c = 0; c < [[_header tabViews] count]; c++ )
+     {
+     [[_header tabViews][c] setAlpha:c == _selectedIndex ? 1.0 : 0.4];
+     }
+     */
 }
 
 - (UIViewController *)_requestViewControllerForIndex:(NSInteger)i
@@ -197,19 +229,20 @@
             font = [UIFont boldSystemFontOfSize:16.0];
         }
         
-        UIColor *color;
-        if ([[self dataSource] respondsToSelector:@selector(titleColor)]) {
-            color = [[self dataSource] titleColor];
-        } else {
-            color = [UIColor whiteColor];
-        }
-        
         // Maio: cambiato il loop per rileggere in tempo reale il titolo dei tabs
         for (int i = 0; i < [[self dataSource] numberOfViewControllers]; i++) {
             if ([[self dataSource] respondsToSelector:@selector(titleForTabAtIndex:)]) {
                 NSString *title;
                 if ((title = [[self dataSource] titleForTabAtIndex:i]) != nil) {
-                    UILabel *label = [UILabel new];
+                    UIColor *color;
+                    if ([[self dataSource] respondsToSelector:@selector(titleColorForIndex:)]) {
+                        color = [[self dataSource] titleColorForIndex:i];
+                    } else {
+                        color = [UIColor whiteColor];
+                    }
+
+                    UILabelPagerNew *label = [UILabelPagerNew new];
+                    [label setAssignedIndex:i];
                     [label setText:title];
                     [label setTextAlignment:NSTextAlignmentCenter];
                     [label setFont:font];
