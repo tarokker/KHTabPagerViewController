@@ -324,8 +324,11 @@
             
             // maio
             [weakSelf _refreshTabColorsAfterAppearing];
-            
             weakSelf.pageScrollView.scrollEnabled = YES;
+            if ( [[weakSelf dataSource] respondsToSelector:@selector(didSelectTabAtIndexOnPager:index:)] )
+            {
+                [[weakSelf dataSource] didSelectTabAtIndexOnPager:weakSelf index:index];
+            }
         };
         
         if ( _enableTapClickAnimation )

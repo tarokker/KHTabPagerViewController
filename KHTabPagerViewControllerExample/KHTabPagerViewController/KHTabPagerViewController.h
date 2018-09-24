@@ -36,6 +36,7 @@
 - (UIViewController *)viewControllerForIndex:(NSInteger)index;
 
 @optional
+- (void)didSelectTabAtIndexOnPager:(KHTabPagerViewController *)source index:(NSInteger)index;
 - (UIView *)viewForTabAtIndex:(NSInteger)index;
 - (NSString *)titleForTabAtIndex:(NSInteger)index;
 - (CGFloat)tabHeight;
